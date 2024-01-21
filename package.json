@@ -1,0 +1,18 @@
+{
+  "name": "wa-scraper-aws",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:rousso1/wa-scraper-aws.git",
+  "author": "Eitan Rousso <rousso@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "aws-config": "^1.4.0",
+    "aws-sdk": "^2.1537.0",
+    "dotenv": "^16.3.1",
+    "mime-types": "^2.1.35",
+    "node-telegram-bot-api": "^0.64.0",
+    "qrcode": "^1.5.3",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.23.0"
+  }
+}

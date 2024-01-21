@@ -1,0 +1,8 @@
+node_modules/
+test/data2/
+.wwebjs_auth/
+.wwebjs_cache/
+.DS_Store
+.env
+whatsapp-raw-entry-bucket/
+
