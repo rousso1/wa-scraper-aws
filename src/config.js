@@ -1,4 +1,3 @@
-//https://docs.google.com/spreadsheets/d/1fpZ9P6kbvex6PmPkqATrhzTWWdYwuGSAP_iLTEw-H_A/edit#gid=1910031049
 require('dotenv').config();
 
 (() => {
