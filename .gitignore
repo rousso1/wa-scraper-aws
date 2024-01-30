@@ -5,4 +5,4 @@ test/data2/
 .DS_Store
 .env
 whatsapp-raw-entry-bucket/
-
+setupEnv.js
