@@ -17,6 +17,9 @@ require('dotenv').config();
     'PREPROCESSING_QUEUE',
     'AWS_REGION',
     'AWS_PROFILE',
+    'NEO4J_URI',
+    'NEO4J_USERNAME',
+    'NEO4J_PASSWORD',
   ].filter((envVar) => typeof process.env[envVar] === 'undefined');
 
   if (missingVars.length) {
@@ -65,4 +68,7 @@ module.exports = {
   preprocessingQueue: process.env.PREPROCESSING_QUEUE,
   awsRegion: process.env.AWS_REGION,
   awsProfile: process.env.AWS_PROFILE,
+  neo4jUri: process.env.NEO4J_URI,
+  neo4jUser: process.env.NEO4J_USERNAME,
+  neo4jPass: process.env.NEO4J_PASSWORD,
 };

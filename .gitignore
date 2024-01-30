@@ -6,3 +6,4 @@ test/data2/
 .env
 whatsapp-raw-entry-bucket/
 setupEnv.js
+temp/
