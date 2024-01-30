@@ -1,5 +1,5 @@
 const config = require('./config');
-const { Client, RemoteAuth, LocalAuth } = require('whatsapp-web.js');
+const { Client, LocalAuth } = require('whatsapp-web.js');
 const onMessage = require('./onMessage');
 const onGroup = require('./onGroup');
 const onContact = require('./onContact');

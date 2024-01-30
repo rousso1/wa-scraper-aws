@@ -9,6 +9,8 @@ require('dotenv').config();
     'DEVICE_ACCOUNT',
     'GETCHATS_TIMER_INTERVAL_MINUTES',
     'GETCHATS_TIMER_DELAY_MINUTES',
+    'GETPROFILES_TIMER_INTERVAL_MINUTES',
+    'GETPROFILES_TIMER_DELAY_MINUTES',
     'TELEGRAM_BOT_TOKEN',
     'TELEGRAM_ADMIN_CHAT_ID',
     'SCRAPER_BUCKET_NAME',
@@ -51,8 +53,10 @@ const puppeteerConfig = deployedOnUbuntu
     };
 
 module.exports = {
-  timerIntervalMs: Math.round(parseFloat(process.env.GETCHATS_TIMER_INTERVAL_MINUTES) * 60 * 1000),
-  timerDelayMs: Math.round(parseFloat(process.env.GETCHATS_TIMER_DELAY_MINUTES) * 60 * 1000),
+  getChatsTimerIntervalMs: Math.round(parseFloat(process.env.GETCHATS_TIMER_INTERVAL_MINUTES) * 60 * 1000),
+  getChatsTimerDelayMs: Math.round(parseFloat(process.env.GETCHATS_TIMER_DELAY_MINUTES) * 60 * 1000),
+  getProfilesTimerIntervalMs: Math.round(parseFloat(process.env.GETPROFILES_TIMER_INTERVAL_MINUTES) * 60 * 1000),
+  getProfilesTimerDelayMs: Math.round(parseFloat(process.env.GETPROFILES_TIMER_DELAY_MINUTES) * 60 * 1000),
   puppeteerConfig,
   phoneConfig,
   tgBotToken: process.env.TELEGRAM_BOT_TOKEN,

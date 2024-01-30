@@ -42,29 +42,34 @@ const handleMedia = async (msg) => {
     s3Helper.saveToS3(mediaKey, config.bucketName, Buffer.from(media.data, 'base64'), media.mimetype),
   ];
 
-  return { mediaPromises, mediaKey };
+  return mediaPromises;
 };
 
 const onMessage = async (msg) => {
   const keyName = getKey(msg, `${msg.id._serialized}.json`);
+  msg.eventName = 'message';
   const msgPromise = s3Helper.saveToS3(keyName, config.bucketName, JSON.stringify(msg));
-  const { msgMediaPromises, mediaKey } = await handleMedia(msg);
+  const msgMediaPromises = await handleMedia(msg);
 
   await Promise.all([msgPromise].concat(msgMediaPromises));
-  if (mediaKey) {
-    await sqsHelper.sendToQueue(config.preprocessingQueue, JSON.stringify({ base64FileKey: mediaKey }));
-  }
 };
 
 const onMessageReaction = async (reaction) => {
   const key = keys.getMessageReactionKey(reaction);
+  reaction.eventName = 'message_reaction';
 
   return s3Helper.saveToS3(key, config.bucketName, JSON.stringify(reaction));
 };
 
 const onMessageEdit = async (msg, newBody, prevBody) => {
   const key = getKey(msg, `${msg.id._serialized}-edit-${getHash(newBody, 10)}.json`);
-  return s3Helper.saveToS3(key, config.bucketName, JSON.stringify({ msg, newBody, prevBody }));
+  const jsonToSave = {
+    eventName: 'message_edit',
+    msg,
+    newBody,
+    prevBody,
+  };
+  return s3Helper.saveToS3(key, config.bucketName, JSON.stringify(jsonToSave));
 };
 
 module.exports = { onMessage, onMessageReaction, onMessageEdit };
