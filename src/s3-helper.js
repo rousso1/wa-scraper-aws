@@ -1,11 +1,9 @@
 const mime = require('mime-types');
-// const AWS = require('./aws');
 const path = require('path');
 const config = require('./config');
 const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 
 const s3Client = new S3Client({ region: config.awsRegion });
-// const s3 = new AWS.S3(); //old V2
 // const S3Mock = require('../test/AWS/s3/mock-s3');
 // const s3 = new S3Mock();
 
@@ -45,7 +43,6 @@ const getFromS3 = async (bucketName, key) => {
   };
 
   const s3Object = await s3Client.send(new GetObjectCommand(params));
-  // const s3Object = await s3.getObject(params).promise(); //old V2
   const encoding = getEncoding(key);
   const response = s3Object.Body.toString(encoding);
   return getExtension(key) === 'json' ? JSON.parse(response) : response;
@@ -66,7 +63,6 @@ async function saveToS3(key, bucketName, body, contentType = null) {
   console.log(`uploading ${uploadParams.ContentType}: ${path.join(bucketName, key)}`);
   const command = new PutObjectCommand(uploadParams);
   return await s3Client.send(command);
-  // return s3.upload(uploadParams).promise(); //old V2
 
   // return s3
   //   .upload(uploadParams)
@@ -119,7 +115,6 @@ async function deleteFromS3(key, bucketName) {
   };
 
   return await s3Client.send(new DeleteObjectCommand(deleteParams));
-  // return s3.deleteObject(deleteParams).promise(); //old v2
 }
 
 module.exports = { getFromS3, saveToS3, deleteFromS3, getSource, getExtension };

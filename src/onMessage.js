@@ -1,5 +1,4 @@
 const s3Helper = require('./s3-helper');
-const sqsHelper = require('./sqs-helper');
 const config = require('./config');
 const mime = require('mime-types');
 const keys = require('./s3Keys');

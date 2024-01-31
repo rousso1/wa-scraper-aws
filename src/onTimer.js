@@ -15,66 +15,17 @@ const getGetProfilesKey = () => {
   return path.join('profiles', `profiles-${config.phoneConfig.sim}-${currentTime}.json`);
 };
 
-const getGropuPictureBase64 = async (groupId, waPage) => {
-  const result = await waPage.evaluate(async (groupId) => {
-    const chatWid = window.Store.WidFactory.createWid(groupId);
-    return await window.WWebJS.getProfilePicThumbToBase64(chatWid);
-  }, groupId);
+// const getGropuPictureBase64 = async (groupId, waPage) => {
+//   const result = await waPage.evaluate(async (groupId) => {
+//     const chatWid = window.Store.WidFactory.createWid(groupId);
+//     return await window.WWebJS.getProfilePicThumbToBase64(chatWid);
+//   }, groupId);
 
-  return result;
-};
+//   return result;
+// };
 
 const getProfiles = async (waPage) => {
-  // const pages = await browser.pages();
-  // const waPage = pages[0];
-
   const profiles = await waPage.evaluate(async () => {
-    // const delayRandomTime = async (minTimeMs = 4000, maxTimeMs = 8000) => {
-    //   const waitTime = maxTimeMs ? Math.round((maxTimeMs - minTimeMs) * Math.random() + minTimeMs) : minTimeMs;
-    //   console.log(`waiting ${waitTime / 1000} seconds...`);
-    //   return new Promise((resolve, reject) => {
-    //     setTimeout(() => {
-    //       resolve(waitTime);
-    //     }, waitTime);
-    //   });
-    // };
-
-    // const getToDataUrlParams = (imgSrc) => {
-    //   const url = new URL(imgSrc);
-    //   const pathNameArr = url.pathname.split('.');
-    //   const extName = pathNameArr.pop();
-    //   switch (extName) {
-    //     case 'jpg':
-    //       return ['image/jpeg', 1.0];
-    //     case 'webp':
-    //       return ['image/webp', 1.0];
-    //     default:
-    //       return ['image/png', 1.0];
-    //   }
-    // };
-
-    // const getBase64Image = async (imgSrc) => {
-    //   const img = new Image();
-
-    //   img.crossOrigin = 'anonymous';
-    //   img.src = imgSrc;
-    //   await new Promise((imgResolve, imgReject) => {
-    //     img.onload = imgResolve;
-    //     img.onerror = imgReject;
-    //   });
-
-    //   const canvas = document.createElement('canvas');
-    //   const ctx = canvas.getContext('2d');
-    //   canvas.width = img.width;
-    //   canvas.height = img.height;
-    //   ctx.drawImage(img, 0, 0);
-
-    //   // Get the base64 representation of the image
-    //   const params = getToDataUrlParams(imgSrc);
-    //   const base64String = canvas.toDataURL(params[0], params[1]);
-    //   return base64String;
-    // };
-
     const results = window.Store.Contact._models
       .filter((model) => {
         return model.attributes?.pushname;
@@ -86,17 +37,8 @@ const getProfiles = async (waPage) => {
         };
       });
 
-    // const resultsWithPictures = results.filter((result) => result.picSrc);
-
-    // for (const resWithPic of resultsWithPictures) {
-    //   await delayRandomTime();
-    //   resWithPic.base64Picture = await getBase64Image(resWithPic.picSrc);
-    // }
-
     return results;
   });
-
-  // fs.writeFileSync(`./profiles-${new Date().getTime()}.json`, JSON.stringify(profiles), { encoding: 'utf-8' });
 
   await s3Helper.saveToS3(
     getGetProfilesKey(),
