@@ -3,14 +3,9 @@ const sqsHelper = require('./sqs-helper');
 const config = require('./config');
 const mime = require('mime-types');
 const keys = require('./s3Keys');
-const crypto = require('crypto');
+const lib = require('./lib');
 
 const getKey = keys.getMessageKey;
-
-const getHash = (str, len = 12) => {
-  const hash = crypto.createHash('sha256').update(str).digest('hex');
-  return hash.substring(0, len);
-};
 
 const handleMedia = async (msg) => {
   if (!msg.hasMedia) {
@@ -32,6 +27,7 @@ const handleMedia = async (msg) => {
     filesize: media.filesize,
     filename: media.filename,
     mimetype: media.mimetype,
+    eventName: 'media-metadata',
   };
 
   const mediaKey = getKey(msg, `${msg.id._serialized}.${extension}`);
@@ -62,7 +58,7 @@ const onMessageReaction = async (reaction) => {
 };
 
 const onMessageEdit = async (msg, newBody, prevBody) => {
-  const key = getKey(msg, `${msg.id._serialized}-edit-${getHash(newBody, 10)}.json`);
+  const key = getKey(msg, `${msg.id._serialized}-edit-${lib.getHash(newBody, 10)}.json`);
   const jsonToSave = {
     eventName: 'message_edit',
     msg,

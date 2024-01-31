@@ -6,8 +6,7 @@
   "author": "Eitan Rousso <rousso@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "aws-config": "^1.4.0",
-    "aws-sdk": "^2.1537.0",
+    "@aws-sdk/client-s3": "^3.504.0",
     "dotenv": "^16.3.1",
     "mime-types": "^2.1.35",
     "neo4j-driver": "^5.17.0",

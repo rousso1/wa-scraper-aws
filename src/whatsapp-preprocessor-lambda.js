@@ -1,7 +1,9 @@
 const s3Helper = require('./s3-helper');
 const cypher = require('./eventHandlers');
+const path = require('path');
 
 const handleWhatsapp = async (eventData) => {
+  console.log(`Received eventName: ${eventData.eventName}`);
   switch (eventData.eventName) {
     case 'get_chats':
       return cypher.getChatsHandler(eventData);
@@ -31,15 +33,17 @@ const handleWhatsapp = async (eventData) => {
       return cypher.messageHandler(eventData);
 
     case 'message_reaction':
-      break;
+      return cypher.messageReactionHandler(eventData);
 
     case 'message_edit':
+      break;
+
+    default:
       break;
   }
 };
 
 const handler = async (event) => {
-  console.log(`Received event ${JSON.stringify(event)}`);
   for (let record of event.Records) {
     const sqsMessage = JSON.parse(record.body);
 
@@ -47,8 +51,10 @@ const handler = async (event) => {
       const key = decodeURIComponent(s3Record.s3.object.key);
       const bucketName = s3Record.s3.bucket.name;
 
-      let contentForIndexing = await s3Helper.getFromS3(bucketName, key);
-      await handleWhatsapp(contentForIndexing);
+      if (path.extname(key) === '.json') {
+        let contentForIndexing = await s3Helper.getFromS3(bucketName, key);
+        await handleWhatsapp(contentForIndexing);
+      }
     }
   }
 };
