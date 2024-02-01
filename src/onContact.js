@@ -3,9 +3,11 @@ const s3Helper = require('./s3-helper');
 const config = require('./config');
 
 const onContactChanged = (message, oldId, newId, isContact) => {
+  const eventName = 'contact_changed';
+  stats.report(eventName);
   const key = keys.getContactChangedKey(oldId, newId);
   const jsonToSave = {
-    eventName: 'contact_changed',
+    eventName,
     message,
     oldId,
     newId,

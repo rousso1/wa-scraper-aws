@@ -1,7 +1,7 @@
 {
   "name": "wa-scraper-aws",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "scraper.js",
   "repository": "git@github.com:rousso1/wa-scraper-aws.git",
   "author": "Eitan Rousso <rousso@gmail.com>",
   "license": "MIT",

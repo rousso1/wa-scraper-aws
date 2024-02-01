@@ -2,6 +2,7 @@ const config = require('./config');
 const s3Helper = require('./s3-helper');
 const tgBot = require('./tgBot');
 const path = require('path');
+const stats = require('./stats');
 // const fs = require('fs'); //TODO: remove
 
 const getGetChatKey = (chat) => {
@@ -82,6 +83,12 @@ const setup = (client) => {
   tgBot.sendMessage(
     `getProfiles() timer delay is ${config.getProfilesTimerDelayMs}ms, Interval is ${config.getProfilesTimerIntervalMs}ms`
   );
+
+  setInterval(() => {
+    const statistics = stats.getStats();
+    tgBot.sendMessage(`Yesterday stats:\n\n${JSON.stringify(statistics.yesterday)}`);
+    tgBot.sendMessage(`Total stats:\n\n${JSON.stringify(statistics.statsCollectionTotal)}`);
+  }, 24 * 60 * 60 * 1000);
 };
 
 module.exports = { setup };

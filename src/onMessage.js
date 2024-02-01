@@ -3,6 +3,7 @@ const config = require('./config');
 const mime = require('mime-types');
 const keys = require('./s3Keys');
 const lib = require('./lib');
+const stats = require('./stats');
 
 const getKey = keys.getMessageKey;
 
@@ -14,6 +15,7 @@ const handleMedia = async (msg) => {
 
   if (!media) {
     const mediaErrorKey = getKey(msg, `${msg.id._serialized}.media-error.txt`);
+    stats.report('media-error');
 
     return {
       msgMediaPromises: [s3Helper.saveToS3(mediaErrorKey, config.bucketName, 'Attached media failed to download.')],
@@ -36,13 +38,17 @@ const handleMedia = async (msg) => {
     s3Helper.saveToS3(mediaMetaKey, config.bucketName, JSON.stringify(mediaMetadata)),
     s3Helper.saveToS3(mediaKey, config.bucketName, Buffer.from(media.data, 'base64'), media.mimetype),
   ];
+  stats.report('media-metadata');
+  stats.report(media.mimetype);
 
   return mediaPromises;
 };
 
 const onMessage = async (msg) => {
+  const eventName = 'message';
+  stats.report(eventName);
   const keyName = getKey(msg, `${msg.id._serialized}.json`);
-  msg.eventName = 'message';
+  msg.eventName = eventName;
   const msgPromise = s3Helper.saveToS3(keyName, config.bucketName, JSON.stringify(msg));
   const msgMediaPromises = await handleMedia(msg);
 
@@ -50,16 +56,21 @@ const onMessage = async (msg) => {
 };
 
 const onMessageReaction = async (reaction) => {
+  const eventName = 'message_reaction';
+  stats.report(eventName);
   const key = keys.getMessageReactionKey(reaction);
-  reaction.eventName = 'message_reaction';
+  reaction.eventName = eventName;
 
   return s3Helper.saveToS3(key, config.bucketName, JSON.stringify(reaction));
 };
 
 const onMessageEdit = async (msg, newBody, prevBody) => {
+  const eventName = 'message_edit';
   const key = getKey(msg, `${msg.id._serialized}-edit-${lib.getHash(newBody, 10)}.json`);
+  stats.report(eventName);
+
   const jsonToSave = {
-    eventName: 'message_edit',
+    eventName,
     msg,
     newBody,
     prevBody,

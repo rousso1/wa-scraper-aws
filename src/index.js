@@ -1,51 +1,65 @@
-const config = require('./config');
-const { Client, LocalAuth } = require('whatsapp-web.js');
-const onMessage = require('./onMessage');
-const onGroup = require('./onGroup');
-const onContact = require('./onContact');
-const onSetup = require('./onSetup');
-const onTimer = require('./onTimer');
+const s3Helper = require('./s3-helper');
+const cypher = require('./eventHandlers');
+const path = require('path');
 
-const createPassiveClient = async () => {
-  const clientId = `${config.phoneConfig.sim.substring(1)}_${config.phoneConfig.simId}`;
+/* whatsapp-preprocessor lambda */
 
-  const client = new Client({
-    authStrategy: new LocalAuth({ clientId }),
-    puppeteer: config.puppeteerConfig,
-  });
+const handleWhatsapp = async (eventData) => {
+  console.log(`Received eventName: ${eventData.eventName}`);
+  switch (eventData.eventName) {
+    case 'get_chats':
+      return cypher.getChatsHandler(eventData);
 
-  client.on('ready', onSetup.onReady);
-  client.on('qr', onSetup.onQR);
-  client.on('remote_session_saved', onSetup.onRemoteSessionSaved);
-  client.on('loading_screen', onSetup.onLoadingScreen);
-  client.on('authenticated', onSetup.onAuthenticated);
-  client.on('auth_failure', onSetup.onAuthFailure);
-  client.on('disconnected', onSetup.onDisconnected);
+    case 'get_profiles':
+      return cypher.getProfilesHandler(eventData);
 
-  client.on('group_join', onGroup.onGroupJoin);
-  client.on('group_leave', onGroup.onGroupLeave);
-  client.on('group_membership_request', onGroup.onGroupMembershipRequest);
-  client.on('group_update', onGroup.onGroupUpdate);
-  client.on('group_admin_changed', onGroup.onGroupAdminChange);
+    case 'contact_changed':
+      return cypher.contactChangedHandler(eventData);
 
-  client.on('contact_changed', onContact.onContactChanged);
+    case 'group_leave':
+      return cypher.groupLeaveHandler(eventData);
 
-  client.on('message', onMessage.onMessage);
-  client.on('message_reaction', onMessage.onMessageReaction);
-  client.on('message_edit', onMessage.onMessageEdit);
+    case 'group_join':
+      return cypher.groupJoinHandler(eventData);
 
-  await client.initialize();
+    case 'group_membership_request':
+      break;
 
-  onTimer.setup(client);
-  console.log(`${config.phoneConfig.sim} init complete ${new Date().toString()}`);
+    case 'group_update':
+      break;
+
+    case 'group_admin_changed':
+      break;
+
+    case 'message':
+      return cypher.messageHandler(eventData);
+
+    case 'message_reaction':
+      return cypher.messageReactionHandler(eventData);
+
+    case 'message_edit':
+      break;
+
+    default:
+      break;
+  }
 };
 
-createPassiveClient();
+const handler = async (event) => {
+  for (let record of event.Records) {
+    const sqsMessage = JSON.parse(record.body);
 
-// const setupMockLambdaQueue = async () => {
-//   const preprocessor = require('./whatsapp-preprocessor-lambda');
-//   const mockSqs = require('../test/AWS/sqs/mock-sqs');
-//   const QueueUrl = (await mockSqs.getQueueUrl({ QueueName: config.preprocessingQueue }).promise()).QueueUrl;
-//   mockSqs.registerMessageHandler(QueueUrl, preprocessor.handler);
-// };
-// setupMockLambdaQueue();
+    for (let s3Record of sqsMessage.Records) {
+      const key = decodeURIComponent(s3Record.s3.object.key);
+      const bucketName = s3Record.s3.bucket.name;
+
+      if (path.extname(key) === '.json') {
+        console.log(`handleWhatsapp with ${key}`);
+        let contentForIndexing = await s3Helper.getFromS3(bucketName, key);
+        await handleWhatsapp(contentForIndexing);
+      }
+    }
+  }
+};
+
+module.exports = { handler };

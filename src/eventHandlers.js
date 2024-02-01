@@ -1,6 +1,5 @@
 const cypher = require('./cypherQueries');
 const lib = require('./lib');
-const fs = require('fs');
 
 const idToPhone = (id) => {
   return `+${id.split('@')[0]}`;

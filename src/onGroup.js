@@ -3,31 +3,41 @@ const s3Helper = require('./s3-helper');
 const config = require('./config');
 
 const onGroupLeave = async (groupNotification) => {
+  const eventName = 'group_leave';
+  stats.report(eventName);
   const key = keys.getGroupLeaveKey(groupNotification);
-  groupNotification.eventName = 'group_leave';
+  groupNotification.eventName = eventName;
   return s3Helper.saveToS3(key, config.bucketName, JSON.stringify(groupNotification));
 };
 
 const onGroupJoin = async (groupNotification) => {
+  const eventName = 'group_join';
+  stats.report(eventName);
   const key = keys.getGroupJoinKey(groupNotification);
-  groupNotification.eventName = 'group_join';
+  groupNotification.eventName = eventName;
   return s3Helper.saveToS3(key, config.bucketName, JSON.stringify(groupNotification));
 };
 const onGroupMembershipRequest = (membershipRequest) => {
+  const eventName = 'group_membership_request';
+  stats.report(eventName);
   const key = keys.getGroupMembershipRequestKey(membershipRequest);
-  membershipRequest.eventName = 'group_membership_request';
+  membershipRequest.eventName = eventName;
   return s3Helper.saveToS3(key, config.bucketName, JSON.stringify(membershipRequest));
 };
 
 const onGroupUpdate = (groupUpdate) => {
+  const eventName = 'group_update';
+  stats.report(eventName);
   const key = keys.getGroupUpdateKey(groupUpdate);
-  groupUpdate.eventName = 'group_update';
+  groupUpdate.eventName = eventName;
   return s3Helper.saveToS3(key, config.bucketName, JSON.stringify(groupUpdate));
 };
 
 const onGroupAdminChange = (groupAdminChange) => {
+  const eventName = 'group_admin_changed';
+  stats.report(eventName);
   const key = keys.getGroupAdminChangeKey(groupAdminChange);
-  groupAdminChange.eventName = 'group_admin_changed';
+  groupAdminChange.eventName = eventName;
   return s3Helper.saveToS3(key, config.bucketName, JSON.stringify({ message, oldId, newId, isContact }));
 };
 
