@@ -39,7 +39,7 @@ if (isNaN(phoneConfig.simId)) {
   process.exit(1);
 }
 
-const deployedOnUbuntu = process.cwd().startsWith('/Users/ubuntu');
+const deployedOnUbuntu = process.cwd().startsWith('/home/ubuntu/');
 
 const puppeteerConfig = deployedOnUbuntu
   ? {
