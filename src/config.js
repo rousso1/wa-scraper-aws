@@ -67,4 +67,5 @@ module.exports = {
   neo4jUri: process.env.NEO4J_URI,
   neo4jUser: process.env.NEO4J_USERNAME,
   neo4jPass: process.env.NEO4J_PASSWORD,
+  waAccountDescription: `${phoneConfig.device}, ${phoneConfig.account} (${phoneConfig.name}) (${phoneConfig.sim}) (${phoneConfig.simId})`,
 };

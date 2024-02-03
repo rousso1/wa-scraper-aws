@@ -88,7 +88,11 @@ const setup = (client) => {
     const statistics = stats.getStats();
     tgBot.sendMessage(`Yesterday stats:\n\n${JSON.stringify(statistics.yesterday)}`);
     tgBot.sendMessage(`Total stats:\n\n${JSON.stringify(statistics.statsCollectionTotal)}`);
-  }, 24 * 60 * 60 * 1000);
+  }, 24 * 60 * 60 * 1000); //report every 24 hours
+
+  setInterval(() => {
+    tgBot.sendMessage(`Its been 12 days since opening the app last time:\n ${config.waAccountDescription}`);
+  }, 12 * 24 * 60 * 60 * 1000); //every 12 days
 };
 
 module.exports = { setup };

@@ -37,6 +37,18 @@ const getParticipantsNumbers = (chat, isAdmin = null) => {
   return participants.map((p) => idToPhone(p.id._serialized));
 };
 
+const formatTime = (time) => {
+  if (typeof time === 'undefined') {
+    return '';
+  }
+
+  if (!isNaN(time)) {
+    return lib.formatDateTime(time);
+  }
+
+  return time;
+};
+
 const getGroupFields = (groupId, chat) => {
   const metaData = chat.groupMetadata;
   // Use a regular expression to match invisible characters
@@ -46,11 +58,12 @@ const getGroupFields = (groupId, chat) => {
     groupId,
     createDate: lib.formatDateTime(new Date(metaData.creation * 1000)),
     subject: metaData.subject?.replace(regex, '') || '',
-    subjectTime: lib.formatDateTime(new Date(metaData.subjectTime * 1000)),
+    subjectTime: formatTime(metaData.subjectTime),
     description: metaData.desc?.replace(regex, '') || '',
-    descriptionTime: lib.formatDateTime(new Date(metaData.descTime * 1000)),
+    descriptionTime: formatTime(metaData.descTime),
     descriptionSetBy: metaData.descOwner ? idToPhone(metaData.descOwner._serialized) : '',
     memberAddMode: metaData.memberAddMode || '',
+
     // groupPicture: chat.groupPicture,
   };
   const hash = lib.getHash(Object.values(fields).join(''));

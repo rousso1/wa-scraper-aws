@@ -9,13 +9,11 @@ const log = (message) => {
   console.log(message);
 };
 
-const waAccountDescription = `${config.phoneConfig.device}, ${config.phoneConfig.account} (${config.phoneConfig.name}) (${config.phoneConfig.sim}) (${config.phoneConfig.simId})`;
-
 const onQR = async (qr) => {
   stats.report('qr');
   const qrCodeDataUrl = await qrcode.toDataURL(qr);
   const imageBuffer = Buffer.from(qrCodeDataUrl.split(',')[1], 'base64');
-  const caption = `Scan with ${waAccountDescription}`;
+  const caption = `Scan with ${config.waAccountDescription}`;
 
   await tgBot.sendPhoto(imageBuffer, caption);
 
@@ -25,32 +23,32 @@ const onQR = async (qr) => {
 
 const onRemoteSessionSaved = async () => {
   stats.report('remote_session_saved');
-  log(`onRemoteSessionSaved: ${waAccountDescription}`);
+  log(`onRemoteSessionSaved: ${config.waAccountDescription}`);
 };
 
 const onReady = async () => {
   stats.report('ready');
-  log(`onReady: (${waAccountDescription})`);
+  log(`onReady: (${config.waAccountDescription})`);
 };
 
 const onDisconnected = async (reason) => {
   stats.report('disconnected');
-  log(`onDisconnected: ${reason} (${waAccountDescription})`);
+  log(`onDisconnected: ${reason} (${config.waAccountDescription})`);
 };
 
 const onAuthFailure = (message) => {
   stats.report('auth_failure');
-  log(`onAuthFailure: ${message} (${waAccountDescription})`);
+  log(`onAuthFailure: ${message} (${config.waAccountDescription})`);
 };
 
 const onAuthenticated = () => {
   stats.report('authenticated');
-  log(`onAuthenticated: (${waAccountDescription})`);
+  log(`onAuthenticated: (${config.waAccountDescription})`);
 };
 
 const onLoadingScreen = (percent, message) => {
   stats.report('loading_screen');
-  log(`onLoadingScreen: ${percent} ${message} (${waAccountDescription})`);
+  log(`onLoadingScreen: ${percent} ${message} (${config.waAccountDescription})`);
 };
 
 module.exports = {

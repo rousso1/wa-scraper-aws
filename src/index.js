@@ -1,5 +1,5 @@
 const s3Helper = require('./s3-helper');
-const cypher = require('./eventHandlers');
+const handlers = require('./eventHandlers');
 const path = require('path');
 
 /* whatsapp-preprocessor lambda */
@@ -8,19 +8,19 @@ const handleWhatsapp = async (eventData) => {
   console.log(`Received eventName: ${eventData.eventName}`);
   switch (eventData.eventName) {
     case 'get_chats':
-      return cypher.getChatsHandler(eventData);
+      return handlers.getChatsHandler(eventData);
 
     case 'get_profiles':
-      return cypher.getProfilesHandler(eventData);
+      return handlers.getProfilesHandler(eventData);
 
     case 'contact_changed':
-      return cypher.contactChangedHandler(eventData);
+      return handlers.contactChangedHandler(eventData);
 
     case 'group_leave':
-      return cypher.groupLeaveHandler(eventData);
+      return handlers.groupLeaveHandler(eventData);
 
     case 'group_join':
-      return cypher.groupJoinHandler(eventData);
+      return handlers.groupJoinHandler(eventData);
 
     case 'group_membership_request':
       break;
@@ -32,10 +32,10 @@ const handleWhatsapp = async (eventData) => {
       break;
 
     case 'message':
-      return cypher.messageHandler(eventData);
+      return handlers.messageHandler(eventData);
 
     case 'message_reaction':
-      return cypher.messageReactionHandler(eventData);
+      return handlers.messageReactionHandler(eventData);
 
     case 'message_edit':
       break;
