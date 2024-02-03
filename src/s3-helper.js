@@ -33,6 +33,15 @@ const getEncoding = (key) => {
   return utf8.includes(extension) ? 'utf-8' : 'binary';
 };
 
+const streamToPromise = async (stream, encoding) => {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    stream.on('data', (chunk) => chunks.push(chunk));
+    stream.on('end', () => resolve(Buffer.concat(chunks).toString(encoding)));
+    stream.on('error', reject);
+  });
+};
+
 const getFromS3 = async (bucketName, key) => {
   console.log(`Getting ${key} from ${bucketName}`);
 
@@ -43,7 +52,7 @@ const getFromS3 = async (bucketName, key) => {
 
   const s3Object = await s3Client.send(new GetObjectCommand(params));
   const encoding = getEncoding(key);
-  const response = s3Object.Body.toString(encoding);
+  const response = await streamToPromise(s3Object.Body, encoding);
   return getExtension(key) === 'json' && typeof response !== 'object' ? JSON.parse(response) : response;
 };
 
