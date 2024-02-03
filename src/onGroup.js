@@ -1,6 +1,7 @@
 const keys = require('./s3Keys');
 const s3Helper = require('./s3-helper');
 const config = require('./config');
+const stats = require('./stats');
 
 const onGroupLeave = async (groupNotification) => {
   const eventName = 'group_leave';
