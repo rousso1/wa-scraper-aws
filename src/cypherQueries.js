@@ -7,11 +7,9 @@ const relationshipSource = 'Whatsapp';
 
 (async () => {
   //run once:
-  // const session = driver.session();
-  console.log(
-    `connecting: sample neo4j result: ${JSON.stringify(await driver.executeQuery('MATCH (n) RETURN n LIMIT 1;'))}`
-  );
-  // session.close();
+  const serverInfo = await driver.getServerInfo('neo4j');
+  console.log(`serverInfo: ${JSON.stringify(serverInfo)}`);
+  console.log(`Sample neo4j result: ${JSON.stringify(await driver.executeQuery('MATCH (n) RETURN n LIMIT 1;'))}`);
 })();
 
 const setPhrase = (paramName, fields) => {
@@ -24,15 +22,18 @@ const setPhrase = (paramName, fields) => {
 
 const executeQueries = async (queries, params) => {
   const results = [];
-  // const session = driver.session();
+  const session = driver.session({ defaultAccessMode: neo4j.session.WRITE });
+
   for (const query of queries) {
     console.log(query);
     // await fs.promises.appendFile('./queries-log.cypher', query + '\n\n', { encoding: 'utf-8' });
     // results.push(await session.executeWrite(query, params || {}));
-    console.log('ATTEMPTING:', query, JSON.stringify(params));
-    results.push(await driver.executeQuery(query, params || {}));
+    console.log('ATTEMPTING:', query, JSON.stringify(params || {}));
+    // driver.results.push(await driver.executeQuery(query, params || {}));
+    // driver.results.push(await session.executeWrite((tx) => tx.run(query, params)));
+    driver.results.push(await session.run(query, params || {}));
   }
-  // session.close();
+  session.close();
   return results;
 };
 

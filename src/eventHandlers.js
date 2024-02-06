@@ -38,12 +38,12 @@ const getParticipantsNumbers = (chat, isAdmin = null) => {
 };
 
 const formatTime = (time) => {
-  if (typeof time === 'undefined') {
+  if (typeof time === 'undefined' || time === 0) {
     return '';
   }
 
   if (!isNaN(time)) {
-    return lib.formatDateTime(time);
+    return lib.formatDateTime(new Date(time));
   }
 
   return time;
