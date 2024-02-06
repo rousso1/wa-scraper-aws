@@ -121,9 +121,10 @@ const getChatsHandler = async (eventData) => {
 };
 
 const gotProfileHandler = async (eventData) => {
+  const profile = eventData.profile;
   if (identifiedOnly(eventData.profile)) {
     const timestamp = lib.formatDateTime(new Date());
-    await cypher.upsertContact(idToPhone(item.id._serialized), timestamp, item.pushname);
+    await cypher.upsertContact(idToPhone(profile.id._serialized), timestamp, profile.pushname);
   }
 };
 
