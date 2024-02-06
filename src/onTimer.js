@@ -11,9 +11,15 @@ const getGetChatKey = (chat) => {
   return path.join('group', chatId, 'metadata', `chat-${currentTime}.json`);
 };
 
-const getGetProfilesKey = () => {
+const getGetProfilesKey = (profile) => {
   const currentTime = new Date().getTime();
-  return path.join('profiles', `profiles-${config.phoneConfig.sim}-${currentTime}.json`);
+  return path.join(
+    'profiles',
+    `sim`,
+    `${config.phoneConfig.sim}`,
+    `profile`,
+    `${profile.id._serialized}-${currentTime}.json`
+  );
 };
 
 // const getGropuPictureBase64 = async (groupId, waPage) => {
@@ -41,14 +47,16 @@ const getProfiles = async (waPage) => {
     return results;
   });
 
-  await s3Helper.saveToS3(
-    getGetProfilesKey(),
-    config.bucketName,
-    JSON.stringify({
-      eventName: 'get_profiles',
-      profiles,
-    })
-  );
+  for (const profile of profiles) {
+    await s3Helper.saveToS3(
+      getGetProfilesKey(profile),
+      config.bucketName,
+      JSON.stringify({
+        eventName: 'got_profile',
+        profile,
+      })
+    );
+  }
 };
 
 const getChats = async (client) => {

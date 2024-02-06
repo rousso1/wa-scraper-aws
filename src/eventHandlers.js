@@ -120,11 +120,9 @@ const getChatsHandler = async (eventData) => {
   }
 };
 
-const getProfilesHandler = async (eventData) => {
-  const identifiedItems = eventData.profiles.filter(identifiedOnly);
-  const timestamp = lib.formatDateTime(new Date());
-
-  for (const item of identifiedItems) {
+const gotProfileHandler = async (eventData) => {
+  if (identifiedOnly(eventData.profile)) {
+    const timestamp = lib.formatDateTime(new Date());
     await cypher.upsertContact(idToPhone(item.id._serialized), timestamp, item.pushname);
   }
 };
@@ -180,7 +178,7 @@ const messageReactionHandler = async (eventData) => {
 
 module.exports = {
   getChatsHandler,
-  getProfilesHandler,
+  gotProfileHandler,
   contactChangedHandler,
   groupLeaveHandler,
   groupJoinHandler,

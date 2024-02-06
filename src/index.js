@@ -10,8 +10,8 @@ const handleWhatsapp = async (eventData) => {
     case 'get_chats':
       return handlers.getChatsHandler(eventData);
 
-    case 'get_profiles':
-      return handlers.getProfilesHandler(eventData);
+    case 'got_profile':
+      return handlers.gotProfileHandler(eventData);
 
     case 'contact_changed':
       return handlers.contactChangedHandler(eventData);

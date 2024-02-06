@@ -29,9 +29,9 @@ const executeQueries = async (queries, params) => {
     // await fs.promises.appendFile('./queries-log.cypher', query + '\n\n', { encoding: 'utf-8' });
     // results.push(await session.executeWrite(query, params || {}));
     console.log('ATTEMPTING:', query, JSON.stringify(params || {}));
-    // driver.results.push(await driver.executeQuery(query, params || {}));
-    // driver.results.push(await session.executeWrite((tx) => tx.run(query, params)));
-    driver.results.push(await session.run(query, params || {}));
+    // results.push(await driver.executeQuery(query, params || {}));
+    // results.push(await session.executeWrite((tx) => tx.run(query, params)));
+    results.push(await session.run(query, params || {}));
   }
   session.close();
   return results;
