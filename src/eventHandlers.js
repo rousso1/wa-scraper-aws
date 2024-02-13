@@ -101,6 +101,15 @@ const getChatsHandler = async (eventData, session) => {
     }
   }
 
+  for (const newAdmin of newAdmins) {
+    if (!currentAdmins.includes(newAdmin)) {
+      await cypher.upsertContact(session, newAdmin, timestamp);
+    }
+
+    //run even if exists so timestamp will be updated
+    await cypher.upsertContactToGroupRelationship(session, newAdmin, groupId, 'GROUP_MEMBER', timestamp);
+  }
+
   for (const newMember of newMembers) {
     if (!currentMembers.includes(newMember)) {
       await cypher.upsertContact(session, newMember, timestamp);
@@ -108,15 +117,6 @@ const getChatsHandler = async (eventData, session) => {
 
     //run even if exists so timestamp will be updated
     await cypher.upsertContactToGroupRelationship(session, newMember, groupId, 'GROUP_MEMBER', timestamp);
-  }
-
-  for (const newAdmin of newAdmins) {
-    if (!currentAdmins.includes(newAdmin)) {
-      await cypher.upsertContact(session, newAdmin, timestamp);
-    }
-
-    //run even if exists so timestamp will be updated
-    await cypher.upsertContactToGroupRelationship(session, ewAdmin, groupId, 'GROUP_MEMBER', timestamp);
   }
 };
 
