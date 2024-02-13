@@ -71,7 +71,7 @@ const getGroupFields = (groupId, chat) => {
   return fields;
 };
 
-const getChatsHandler = async (eventData) => {
+const getChatsHandler = async (eventData, session) => {
   if (!eventData.isGroup) {
     return;
   }
@@ -80,101 +80,101 @@ const getChatsHandler = async (eventData) => {
   const groupId = eventData.id._serialized;
   const timestamp = lib.formatDateTime(new Date(eventData.timestamp * 1000));
   //TODO: assert these are received as arrays
-  const currentMembers = await cypher.getContactsWithGroupRelationships(groupId, 'GROUP_MEMBER');
-  const currentAdmins = await cypher.getContactsWithGroupRelationships(groupId, 'GROUP_ADMIN');
+  const currentMembers = await cypher.getContactsWithGroupRelationships(session, groupId, 'GROUP_MEMBER');
+  const currentAdmins = await cypher.getContactsWithGroupRelationships(session, groupId, 'GROUP_ADMIN');
 
-  await cypher.upsertGroup(groupId, getGroupFields(groupId, eventData));
+  await cypher.upsertGroup(session, groupId, getGroupFields(groupId, eventData));
 
   for (const currentMember of currentMembers) {
     if (!newMembers.includes(currentMember)) {
       //those numbers left the group
-      await cypher.deleteContactToGroupRelationship(currentMember, groupId, 'GROUP_MEMBER', timestamp);
-      await cypher.upsertContactToGroupRelationship(currentMember, groupId, 'WAS_GROUP_MEMBER', timestamp);
+      await cypher.deleteContactToGroupRelationship(session, currentMember, groupId, 'GROUP_MEMBER', timestamp);
+      await cypher.upsertContactToGroupRelationship(session, currentMember, groupId, 'WAS_GROUP_MEMBER', timestamp);
     }
   }
 
   for (const currentAdmin of currentAdmins) {
     if (!newAdmins.includes(currentAdmin)) {
       //those numbers are no longer admins
-      await cypher.deleteContactToGroupRelationship(currentAdmin, groupId, 'GROUP_ADMIN', timestamp);
-      await cypher.upsertContactToGroupRelationship(currentAdmin, groupId, 'WAS_GROUP_ADMIN', timestamp);
+      await cypher.deleteContactToGroupRelationship(session, currentAdmin, groupId, 'GROUP_ADMIN', timestamp);
+      await cypher.upsertContactToGroupRelationship(session, currentAdmin, groupId, 'WAS_GROUP_ADMIN', timestamp);
     }
   }
 
   for (const newMember of newMembers) {
     if (!currentMembers.includes(newMember)) {
-      await cypher.upsertContact(newMember, timestamp);
+      await cypher.upsertContact(session, newMember, timestamp);
     }
 
     //run even if exists so timestamp will be updated
-    await cypher.upsertContactToGroupRelationship(newMember, groupId, 'GROUP_MEMBER', timestamp);
+    await cypher.upsertContactToGroupRelationship(session, newMember, groupId, 'GROUP_MEMBER', timestamp);
   }
 
   for (const newAdmin of newAdmins) {
     if (!currentAdmins.includes(newAdmin)) {
-      await cypher.upsertContact(newAdmin, timestamp);
+      await cypher.upsertContact(session, newAdmin, timestamp);
     }
 
     //run even if exists so timestamp will be updated
-    await cypher.upsertContactToGroupRelationship(newAdmin, groupId, 'GROUP_MEMBER', timestamp);
+    await cypher.upsertContactToGroupRelationship(session, ewAdmin, groupId, 'GROUP_MEMBER', timestamp);
   }
 };
 
-const gotProfileHandler = async (eventData) => {
+const gotProfileHandler = async (eventData, session) => {
   const profile = eventData.profile;
   if (identifiedOnly(eventData.profile)) {
     const timestamp = lib.formatDateTime(new Date());
-    await cypher.upsertContact(idToPhone(profile.id._serialized), timestamp, profile.pushname);
+    await cypher.upsertContact(session, idToPhone(profile.id._serialized), timestamp, profile.pushname);
   }
 };
 
-const contactChangedHandler = async (eventData) => {
+const contactChangedHandler = async (eventData, session) => {
   const oldNumber = idToPhone(eventData.oldId);
   const newNumber = idToPhone(eventData.newId);
   const timestamp = lib.formatDateTime(new Date(eventData.message.timestamp * 1000));
 
-  await cypher.upsertContact(oldNumber, timestamp);
-  await cypher.upsertContact(newNumber, timestamp);
-  await cypher.upsertContactToContactRelationship(oldNumber, newNumber, 'CHANGED_TO', timestamp);
+  await cypher.upsertContact(session, oldNumber, timestamp);
+  await cypher.upsertContact(session, newNumber, timestamp);
+  await cypher.upsertContactToContactRelationship(session, oldNumber, newNumber, 'CHANGED_TO', timestamp);
 };
 
-const groupLeaveHandler = async (eventData) => {
+const groupLeaveHandler = async (eventData, session) => {
   const leavingNumbers = eventData.recipientIds.map(idToPhone);
   const groupId = eventData.chatId;
   const timestamp = lib.formatDateTime(new Date(eventData.timestamp * 1000));
 
   for (const leavingNumber of leavingNumbers) {
-    await cypher.deleteContactToGroupRelationship(leavingNumber, groupId, 'GROUP_MEMBER', timestamp);
-    await cypher.upsertContactToGroupRelationship(leavingNumber, groupId, 'WAS_GROUP_MEMBER', timestamp);
+    await cypher.deleteContactToGroupRelationship(session, leavingNumber, groupId, 'GROUP_MEMBER', timestamp);
+    await cypher.upsertContactToGroupRelationship(session, leavingNumber, groupId, 'WAS_GROUP_MEMBER', timestamp);
   }
 };
 
-const groupJoinHandler = async (eventData) => {
+const groupJoinHandler = async (eventData, session) => {
   const newNumbers = eventData.recipientIds.map(idToPhone);
   const groupId = eventData.chatId;
   const timestamp = lib.formatDateTime(new Date(eventData.timestamp * 1000));
 
   for (const newNumber of newNumbers) {
-    await cypher.upsertContact(newNumber, timestamp);
-    await cypher.upsertContactToGroupRelationship(newNumber, groupId, 'GROUP_MEMBER', timestamp);
+    await cypher.upsertContact(session, newNumber, timestamp);
+    await cypher.upsertContactToGroupRelationship(session, newNumber, groupId, 'GROUP_MEMBER', timestamp);
   }
 };
 
-const messageHandler = async (eventData) => {
+const messageHandler = async (eventData, session) => {
   //add AUTHORS_IN_GROUP relationship between contact and group, increase counter
   const timestamp = lib.formatDateTime(new Date(eventData.timestamp * 1000));
   const phoneNumber = idToPhone(eventData.author);
   const groupId = eventData.from;
-  await cypher.upsertContact(phoneNumber, timestamp);
-  await cypher.updateContactEngagedInGroupRelationship(phoneNumber, groupId, 'AUTHORS_IN_GROUP', timestamp);
+  await cypher.upsertContact(session, phoneNumber, timestamp);
+  await cypher.updateContactEngagedInGroupRelationship(session, phoneNumber, groupId, 'AUTHORS_IN_GROUP', timestamp);
 };
 
-const messageReactionHandler = async (eventData) => {
+const messageReactionHandler = async (eventData, session) => {
   const timestamp = lib.formatDateTime(new Date(eventData.timestamp * 1000));
   const phoneNumber = idToPhone(eventData.senderId);
   const groupId = eventData.id.remote;
-  await cypher.upsertContact(phoneNumber, timestamp);
-  await cypher.updateContactEngagedInGroupRelationship(phoneNumber, groupId, 'REACTS_IN_GROUP', timestamp);
+  await cypher.upsertContact(session, phoneNumber, timestamp);
+  await cypher.updateContactEngagedInGroupRelationship(session, phoneNumber, groupId, 'REACTS_IN_GROUP', timestamp);
 };
 
 module.exports = {

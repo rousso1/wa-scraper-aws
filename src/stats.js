@@ -25,16 +25,16 @@ const report = (title) => {
   statsCollectionByDate[year][month][day][title] = (statsCollectionByDate[year][month][day][title] || 0) + 1;
 };
 
-const getStatsOnDate = (date) => {
-  const { year, month, day } = getYearMonthDay(date);
-  return ((statsCollectionByDate[year] || {})[month] || {})[day] || {};
-};
+// const getStatsOnDate = (date) => {
+//   const { year, month, day } = getYearMonthDay(date);
+//   return ((statsCollectionByDate[year] || {})[month] || {})[day] || {};
+// };
 
 const getStats = () => {
-  const yesterday = getStatsOnDate(new Date(new Date().setDate(-1)));
+  // const yesterday = getStatsOnDate(new Date(new Date().setDate(-1)));
 
   return {
-    yesterday,
+    // yesterday,
     statsCollectionTotal,
     statsCollectionByDate,
   };

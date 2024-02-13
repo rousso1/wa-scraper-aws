@@ -3,7 +3,7 @@ const s3Helper = require('./s3-helper');
 const tgBot = require('./tgBot');
 const path = require('path');
 const stats = require('./stats');
-// const fs = require('fs'); //TODO: remove
+const fs = require('fs');
 
 const getGetChatKey = (chat) => {
   const currentTime = new Date().getTime();
@@ -72,6 +72,7 @@ const getChats = async (client) => {
 };
 
 const setup = (client) => {
+  //getChats()
   setTimeout(async () => {
     await getChats(client);
     setInterval(async () => {
@@ -82,6 +83,7 @@ const setup = (client) => {
     `GetChats() timer delay is ${config.getChatsTimerDelayMs}ms, Interval is ${config.getChatsTimerIntervalMs}ms`
   );
 
+  //getProfiles()
   setTimeout(async () => {
     await getProfiles(client.pupPage);
     setInterval(async () => {
@@ -92,15 +94,28 @@ const setup = (client) => {
     `getProfiles() timer delay is ${config.getProfilesTimerDelayMs}ms, Interval is ${config.getProfilesTimerIntervalMs}ms`
   );
 
+  //send statistics
   setInterval(() => {
     const statistics = stats.getStats();
-    tgBot.sendMessage(`Yesterday stats:\n\n${JSON.stringify(statistics.yesterday)}`);
+    tgBot.sendMessage(`ByDate stats:\n\n${JSON.stringify(statistics.statsCollectionByDate)}`);
     tgBot.sendMessage(`Total stats:\n\n${JSON.stringify(statistics.statsCollectionTotal)}`);
   }, 24 * 60 * 60 * 1000); //report every 24 hours
 
-  setInterval(() => {
-    tgBot.sendMessage(`Its been 12 days since opening the app last time:\n ${config.waAccountDescription}`);
-  }, 12 * 24 * 60 * 60 * 1000); //every 12 days
+  //recycle process everyday at 4:30 AM (pm2 will reload it)
+  setTimeout(() => {
+    const interval = setInterval(async () => {
+      const now = new Date();
+      const hr = config.recycleTime.hr;
+      const mn = config.recycleTime.mn;
+
+      //check if its 4:30 AM: (or 4:31)
+      if (now.getHours() === hr && (now.getMinutes() === mn || now.getMinutes() === mn + 1)) {
+        clearInterval(interval);
+        await tgBot.sendMessage(`Recycling on ${hr}:${mn}\ncalling process.exit()\n${config.waAccountDescription}`);
+        process.exit(0);
+      }
+    }, 1 * 60 * 1000); //every minute:
+  }, 10 * 60 * 1000); //delay 10 minutes after start to be very sure its never going to show 4:30 again
 };
 
 module.exports = { setup };
