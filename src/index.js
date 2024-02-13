@@ -2,6 +2,7 @@ const s3Helper = require('./s3-helper');
 const handlers = require('./eventHandlers');
 const path = require('path');
 const driver = require('./cypherQueries.js').driver;
+const neo4j = require('neo4j-driver');
 
 /* whatsapp-preprocessor lambda */
 
