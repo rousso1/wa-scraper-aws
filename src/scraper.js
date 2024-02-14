@@ -5,6 +5,7 @@ const onGroup = require('./onGroup');
 const onContact = require('./onContact');
 const onSetup = require('./onSetup');
 const onTimer = require('./onTimer');
+const tgBot = require('./tgBot');
 
 const createPassiveClient = async () => {
   const clientId = `${config.phoneConfig.sim.substring(1)}_${config.phoneConfig.simId}`;
@@ -37,6 +38,18 @@ const createPassiveClient = async () => {
   await client.initialize();
 
   onTimer.setup(client);
+
+  client.pupPage.on('error', (err) => {
+    console.error('The page crashed:', err);
+    tgBot.sendMessage(`${config.waAccountDescription}\nThe page has crashed:\n${err.toString()}`);
+  });
+
+  client.pupBrowser.on('disconnected', () => {
+    const message = `${config.waAccountDescription}\nThe browser has disconnected`;
+    console.log(message);
+    tgBot.sendMessage(message);
+  });
+
   console.log(`${config.phoneConfig.sim} init complete ${new Date().toString()}`);
 };
 
