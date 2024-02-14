@@ -45,7 +45,7 @@ const puppeteerConfig = deployedOnUbuntu
   ? {
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--single-process'],
-      userDataDir: '/home/ubuntu/scraper/chrome-cache',
+      // userDataDir: '/home/ubuntu/scraper/chrome-cache',
       executablePath: '/usr/bin/google-chrome-stable',
     }
   : {
