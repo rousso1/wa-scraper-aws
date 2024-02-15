@@ -42,12 +42,18 @@ const createPassiveClient = async () => {
   client.pupPage.on('error', (err) => {
     console.error('The page crashed:', err);
     tgBot.sendMessage(`${config.waAccountDescription}\nThe page has crashed:\n${err.toString()}`);
+    setTimeout(() => {
+      process.exit(0);
+    }, 5000);
   });
 
   client.pupBrowser.on('disconnected', () => {
     const message = `${config.waAccountDescription}\nThe browser has disconnected`;
     console.log(message);
     tgBot.sendMessage(message);
+    setTimeout(() => {
+      process.exit(0);
+    }, 5000);
   });
 
   console.log(`${config.phoneConfig.sim} init complete ${new Date().toString()}`);

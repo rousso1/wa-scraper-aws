@@ -101,21 +101,21 @@ const setup = (client) => {
     tgBot.sendMessage(`Total stats:\n\n${JSON.stringify(statistics.statsCollectionTotal)}`);
   }, 24 * 60 * 60 * 1000); //report every 24 hours
 
-  //recycle process everyday at 4:30 AM (pm2 will reload it)
-  setTimeout(() => {
-    const interval = setInterval(async () => {
-      const now = new Date();
-      const hr = config.recycleTime.hr;
-      const mn = config.recycleTime.mn;
+  // //recycle process everyday at 4:30 AM (pm2 will reload it)
+  // setTimeout(() => {
+  //   const interval = setInterval(async () => {
+  //     const now = new Date();
+  //     const hr = config.recycleTime.hr;
+  //     const mn = config.recycleTime.mn;
 
-      //check if its 4:30 AM: (or 4:31)
-      if (now.getHours() === hr && (now.getMinutes() === mn || now.getMinutes() === mn + 1)) {
-        clearInterval(interval);
-        await tgBot.sendMessage(`Recycling on ${hr}:${mn}\ncalling process.exit()\n${config.waAccountDescription}`);
-        process.exit(0);
-      }
-    }, 1 * 60 * 1000); //every minute:
-  }, 10 * 60 * 1000); //delay 10 minutes after start to be very sure its never going to show 4:30 again
+  //     //check if its 4:30 AM: (or 4:31)
+  //     if (now.getHours() === hr && (now.getMinutes() === mn || now.getMinutes() === mn + 1)) {
+  //       clearInterval(interval);
+  //       await tgBot.sendMessage(`Recycling on ${hr}:${mn}\ncalling process.exit()\n${config.waAccountDescription}`);
+  //       process.exit(0);
+  //     }
+  //   }, 1 * 60 * 1000); //every minute:
+  // }, 10 * 60 * 1000); //delay 10 minutes after start to be very sure its never going to show 4:30 again
 };
 
 module.exports = { setup };

@@ -14,7 +14,7 @@ require('dotenv').config();
     'TELEGRAM_BOT_TOKEN',
     'TELEGRAM_ADMIN_CHAT_ID',
     'SCRAPER_BUCKET_NAME',
-    'DAILY_RECYCLE_TIME',
+    // 'DAILY_RECYCLE_TIME',
     'NEO4J_URI',
     'NEO4J_USERNAME',
     'NEO4J_PASSWORD',
@@ -44,8 +44,13 @@ const deployedOnUbuntu = process.cwd().startsWith('/home/ubuntu/');
 const puppeteerConfig = deployedOnUbuntu
   ? {
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--single-process'],
-      // userDataDir: '/home/ubuntu/scraper/chrome-cache',
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--single-process',
+        '--disable-gpu',
+      ],
       executablePath: '/usr/bin/google-chrome-stable',
     }
   : {
@@ -54,7 +59,7 @@ const puppeteerConfig = deployedOnUbuntu
       executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     };
 
-const [hr, mn] = process.env.DAILY_RECYCLE_TIME.split(':').map(parseFloat);
+// const [hr, mn] = process.env.DAILY_RECYCLE_TIME.split(':').map(parseFloat);
 
 module.exports = {
   getChatsTimerIntervalMs: Math.round(parseFloat(process.env.GETCHATS_TIMER_INTERVAL_MINUTES) * 60 * 1000),
@@ -70,5 +75,5 @@ module.exports = {
   neo4jUser: process.env.NEO4J_USERNAME,
   neo4jPass: process.env.NEO4J_PASSWORD,
   waAccountDescription: `${phoneConfig.device}, ${phoneConfig.account} (${phoneConfig.name}) (${phoneConfig.sim}) (${phoneConfig.simId})`,
-  recycleTime: { hr, mn },
+  // recycleTime: { hr, mn },
 };
