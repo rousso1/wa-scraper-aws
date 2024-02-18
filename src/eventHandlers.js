@@ -81,7 +81,9 @@ const getChatsHandler = async (eventData, session) => {
   const timestamp = lib.formatDateTime(new Date(eventData.timestamp * 1000));
   //TODO: assert these are received as arrays
   const currentMembers = await cypher.getContactsWithGroupRelationships(session, groupId, 'GROUP_MEMBER');
+  console.log('CURRENT MEMBERS:', JSON.stringify(currentMembers));
   const currentAdmins = await cypher.getContactsWithGroupRelationships(session, groupId, 'GROUP_ADMIN');
+  console.log('CURRENT ADMINS:', JSON.stringify(currentAdmins));
 
   await cypher.upsertGroup(session, groupId, getGroupFields(groupId, eventData));
 
