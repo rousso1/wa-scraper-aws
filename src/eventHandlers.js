@@ -107,7 +107,7 @@ const getChatsHandler = async (eventData, session) => {
     }
 
     //run even if exists so timestamp will be updated
-    await cypher.upsertContactToGroupRelationship(session, newAdmin, groupId, 'GROUP_MEMBER', timestamp);
+    await cypher.upsertContactToGroupRelationship(session, newAdmin, groupId, 'GROUP_ADMIN', timestamp);
   }
 
   for (const newMember of newMembers) {
