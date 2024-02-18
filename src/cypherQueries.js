@@ -41,26 +41,36 @@ const executeQueries = async (queries, params, session) => {
 };
 
 const upsertContact = async (session, phoneNumber, timestamp, pushName) => {
-  const fields = {
+  const phoneFields = {
+    phoneNumber,
     hash: lib.getHash(phoneNumber),
   };
 
+  const contactFields = { phoneNumber };
+
   if (pushName) {
-    fields.pushName = pushName;
+    contactFields.pushName = pushName;
   }
 
+  contactFields.hash = lib.getHash(Object.values(contactFields).join(''));
+
+  //`${paramName}.${key}=$${key}`
   return executeQueries(
     [
+      `MERGE (c:Phone {phoneNumber: $phoneNumber}) 
+      ON CREATE SET ${setPhrase('c', phoneFields)}
+      ON MATCH SET ${setPhrase('c', phoneFields)};`,
+
       `MERGE (c:WhatsappContact {phoneNumber: $phoneNumber}) 
-     ON CREATE SET ${setPhrase('c', fields)}
-     ON MATCH SET ${setPhrase('c', fields)};`,
+      ON CREATE SET ${setPhrase('c', contactFields)}
+      ON MATCH SET ${setPhrase('c', contactFields)};`,
 
       `MATCH (p:Phone {hash: $hash})
      MATCH (c:WhatsappContact {hash: $hash})
      MERGE (p)-[r:HAS_WHATSAPP]->(c)
      ON CREATE SET r.source = $relationshipSource, r.timestamp = $timestamp;`,
     ],
-    Object.assign(fields, { relationshipSource, timestamp, phoneNumber }),
+    Object.assign(contactFields, { relationshipSource, timestamp, phoneNumber }),
     session
   );
 };
